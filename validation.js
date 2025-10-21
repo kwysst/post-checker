@@ -19,10 +19,15 @@ const validationRules = [
                     return;
                 }
         
-                const lastChar = paragraph.trim()[paragraph.trim().length - 1];
+                const trimmed = paragraph.trim();
+                const lastChar = trimmed[trimmed.length - 1];
                 const endsWithLetter = /[a-zA-Zа-яА-Я0-9]$/.test(lastChar);
-
-                if (endsWithLetter) {
+                
+                // Проверяем, не является ли последнее слово хештегом
+                const lastWord = trimmed.split(/\s+/).pop();
+                const isHashtag = lastWord.startsWith('#');
+    
+                if (endsWithLetter && !isHashtag) {
                     problems.push({
                         start: charIndex + paragraph.length - 1,
                         end: charIndex + paragraph.length,
@@ -39,11 +44,16 @@ const validationRules = [
             return text.split('\n').map(paragraph => {
                 if (paragraph.trim() === '') return paragraph;
                 
-                const lastChar = paragraph.trim()[paragraph.trim().length - 1];
+                const trimmed = paragraph.trim();
+                const lastChar = trimmed[trimmed.length - 1];
                 const endsWithLetter = /[a-zA-Zа-яА-Я0-9]$/.test(lastChar);
                 
-                if (endsWithLetter)
-                    return paragraph.trim() + '.';
+                const lastWord = trimmed.split(/\s+/).pop();
+                const isHashtag = lastWord.startsWith('#');
+                
+                if (endsWithLetter && !isHashtag) {
+                    return trimmed + '.';
+                }
                 return paragraph;
             }).join('\n');
         }
