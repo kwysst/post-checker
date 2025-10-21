@@ -147,6 +147,9 @@ document.addEventListener('DOMContentLoaded', function () {
     checkBtn.addEventListener('click', checkText);
     applyBtn.addEventListener('click', applyFixes);
 
+    checkBtn.addEventListener('click', () => document.getElementsByClassName("header")[0].style.display = 'none');
+    applyBtn.addEventListener('click', () => document.getElementsByClassName("header")[0].style.display = 'none');
+
     // Сброс статуса при изменении текста
     textInput.addEventListener('input', () => {
         resetState();
