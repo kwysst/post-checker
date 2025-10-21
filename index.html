@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проверка поста для соцсетей</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Проверка поста для соцсетей</h1>
+            <p class="subtitle">Проверим текст на ошибки и улучшим оформление</p>
+        </header>
+
+        <main class="main">
+            <div id="status" class="status"></div>
+
+            <div class="input-section">
+                <label for="textInput" class="input-label">Текст поста:</label>
+                <textarea 
+                    id="textInput" 
+                    placeholder="Введите текст вашего поста здесь..."
+                    class="text-input"
+                ></textarea>
+                <span id="copyBtn" class="copy-btn">
+                    <i data-feather="copy" class="copy-icon"></i>
+                    <i data-feather="check" class="check-icon" style="display: none;"></i>
+                </span>
+            </div>
+
+            <div class="actions">
+                <button id="checkBtn" class="btn btn-check">
+                    <i data-feather="search"></i>
+                    Проверить текст
+                </button>
+                
+                <button id="applyBtn" class="btn btn-apply" disabled>
+                    <i data-feather="star"></i>
+                    Применить исправления
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="validation.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
