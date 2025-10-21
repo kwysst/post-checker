@@ -47,7 +47,7 @@ const validationRules = [
             }).join('\n');
         }
     }
-    
+    // lowercaseStart Предложения начинаются с маленькой буквы
     , {
         id: 'lowercaseStart', 
         name: 'Предложения начинаются с маленькой буквы',
@@ -93,22 +93,22 @@ const validationRules = [
             }).join('\n');
         }
     }
-    
+    // noEmoji Отсутствуют смайлики
     , {
         id: 'noEmoji',
         name: 'Отсутствуют смайлики',
         check: (text) => {
-            const emojiRegex = /\p{Emoji}/u;
+            const emojiRegex = /\p{Emoji_Presentation}/u;
             return !emojiRegex.test(text);
         },
         fix: null // Не исправляется автоматически
     }
-    
+    // emojiRatio Мало смайликов в тексте
     , {
         id: 'emojiRatio',
         name: 'Мало смайликов в тексте',
         check: (text) => {
-            const emojiRegex = /\p{Emoji}/gu;
+            const emojiRegex = /\p{Emoji_Presentation}/gu;
             const emojis = text.match(emojiRegex) || [];
             const textWithoutEmojis = text.replace(emojiRegex, '');
             const textLength = textWithoutEmojis.replace(/\s/g, '').length; // длина текста без пробелов и эмодзи
@@ -128,7 +128,7 @@ const validationRules = [
         },
         fix: null // Не исправляется автоматически
     }
-   
+   // emojiAtStart Смайлики в начале абзаца
     , {
         id: 'emojiAtStart',
         name: 'Смайлики в начале абзаца',
@@ -145,7 +145,7 @@ const validationRules = [
                 const trimmed = paragraph.trim();
                 if (trimmed) {
                     const firstSymbol = Array.from(trimmed)[0];
-                    const isEmojiAtStart = /\p{Emoji}/u.test(firstSymbol);
+                    const isEmojiAtStart = /\p{Emoji_Presentation}/u.test(firstSymbol);
                     
                     if (isEmojiAtStart) {
                         currentGroup.push(index);
@@ -176,7 +176,7 @@ const validationRules = [
                 }
     
                 const firstSymbol = Array.from(trimmed)[0];
-                const isEmojiAtStart = /\p{Emoji}/u.test(firstSymbol);
+                const isEmojiAtStart = /\p{Emoji_Presentation}/u.test(firstSymbol);
                 
                 // Исключение: только если это часть группы подряд идущих эмодзи-абзацев
                 const isList = emojiGroups.some(group => group.includes(index));
@@ -206,7 +206,7 @@ const validationRules = [
                 const trimmed = paragraph.trim();
                 if (trimmed) {
                     const firstSymbol = Array.from(trimmed)[0];
-                    const isEmojiAtStart = /\p{Emoji}/u.test(firstSymbol);
+                    const isEmojiAtStart = /\p{Emoji_Presentation}/u.test(firstSymbol);
                     
                     if (isEmojiAtStart) {
                         currentGroup.push(index);
@@ -233,7 +233,7 @@ const validationRules = [
                 if (trimmed === '') return paragraph;
                 
                 const firstSymbol = Array.from(trimmed)[0];
-                const isEmojiAtStart = /\p{Emoji}/u.test(firstSymbol);
+                const isEmojiAtStart = /\p{Emoji_Presentation}/u.test(firstSymbol);
                 const isList = emojiGroups.some(group => group.includes(index));
                 
                 if (isEmojiAtStart && !isList) {
@@ -246,13 +246,13 @@ const validationRules = [
             }).join('\n');
         }
     }
-
+    // emojiSpacing Эмодзи должны быть отделены пробелами от текста
     , {
         id: 'emojiSpacing',
         name: 'Эмодзи должны быть отделены пробелами от текста',
         check: (text) => {
             const problems = [];
-            const emojiRegex = /\p{Emoji}/gu;
+            const emojiRegex = /\p{Emoji_Presentation}/gu;
             let match;
             
             while ((match = emojiRegex.exec(text)) !== null) {
@@ -281,7 +281,7 @@ const validationRules = [
             return problems;
         },
         fix: (text) => {
-            const emojiRegex = /\p{Emoji}/gu;
+            const emojiRegex = /\p{Emoji_Presentation}/gu;
             
             return text.replace(emojiRegex, (emoji, index) => {
                 const charBefore = text[index - 1];
