@@ -237,11 +237,68 @@ const validationRules = [
                 const isList = emojiGroups.some(group => group.includes(index));
                 
                 if (isEmojiAtStart && !isList) {
-                    return paragraph.replace(new RegExp(`^\\s*${firstSymbol}`), '').trim();
+                    // Экранируем специальные символы в эмодзи для regex
+                    const escapedSymbol = firstSymbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    return paragraph.replace(new RegExp(`^\\s*${escapedSymbol}`), '').trim();
                 }
                 
                 return paragraph;
             }).join('\n');
+        }
+    }
+
+    , {
+        id: 'emojiSpacing',
+        name: 'Эмодзи должны быть отделены пробелами от текста',
+        check: (text) => {
+            const problems = [];
+            const emojiRegex = /\p{Emoji}/gu;
+            let match;
+            
+            while ((match = emojiRegex.exec(text)) !== null) {
+                const emoji = match[0];
+                const index = match.index;
+                
+                // Проверяем символ перед эмодзи
+                const charBefore = text[index - 1];
+                const hasTextBefore = charBefore && /\S/.test(charBefore);
+                const needsSpaceBefore = hasTextBefore && charBefore !== ' ' && charBefore !== '\n';
+                
+                // Проверяем символ после эмодзи
+                const charAfter = text[index + emoji.length];
+                const hasTextAfter = charAfter && /\S/.test(charAfter);
+                const needsSpaceAfter = hasTextAfter && charAfter !== ' ' && charAfter !== '\n';
+                
+                if (needsSpaceBefore || needsSpaceAfter) {
+                    problems.push({
+                        start: index,
+                        end: index + emoji.length,
+                        message: `Добавьте пробелы вокруг эмодзи`
+                    });
+                }
+            }
+            
+            return problems;
+        },
+        fix: (text) => {
+            const emojiRegex = /\p{Emoji}/gu;
+            
+            return text.replace(emojiRegex, (emoji, index) => {
+                const charBefore = text[index - 1];
+                const charAfter = text[index + emoji.length];
+                
+                const hasTextBefore = charBefore && /\S/.test(charBefore);
+                const needsSpaceBefore = hasTextBefore && charBefore !== ' ' && charBefore !== '\n';
+                
+                const hasTextAfter = charAfter && /\S/.test(charAfter);
+                const needsSpaceAfter = hasTextAfter && charAfter !== ' ' && charAfter !== '\n';
+                
+                let result = emoji;
+                if (needsSpaceBefore) result = ' ' + result;
+                if (needsSpaceAfter) result = result + ' ';
+                
+                return result;
+            });
         }
     }
 
