@@ -4,6 +4,7 @@
 // текстик
 
 const validationRules = [
+    // missingDot Отсутствуют точки в конце абзацев
     {
         id: 'missingDot',
         name: 'Отсутствуют точки в конце абзацев',
@@ -18,7 +19,7 @@ const validationRules = [
                     return;
                 }
         
-                const lastChar = paragraph[paragraph.length - 1];
+                const lastChar = paragraph.trim()[paragraph.trim().length - 1];
                 const endsWithLetter = /[a-zA-Zа-яА-Я0-9]$/.test(lastChar);
 
                 if (endsWithLetter) {
@@ -38,11 +39,11 @@ const validationRules = [
             return text.split('\n').map(paragraph => {
                 if (paragraph.trim() === '') return paragraph;
                 
-                const lastChar = paragraph[paragraph.length - 1];
+                const lastChar = paragraph.trim()[paragraph.trim().length - 1];
                 const endsWithLetter = /[a-zA-Zа-яА-Я0-9]$/.test(lastChar);
                 
                 if (endsWithLetter)
-                    return paragraph + '.';
+                    return paragraph.trim() + '.';
                 return paragraph;
             }).join('\n');
         }
@@ -120,7 +121,7 @@ const validationRules = [
             if (currentEmojis < requiredEmojis) {
                 return {
                     problem: true,
-                    message: `Добавьте ещё ${requiredEmojis - currentEmojis} смайликов (сейчас ${currentEmojis}, нужно ${requiredEmojis})`
+                    message: `Добавьте ещё ${requiredEmojis - currentEmojis} смайликов (сейчас ${currentEmojis}, нужно ~ ${requiredEmojis})`
                 };
             }
             
