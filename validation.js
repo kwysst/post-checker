@@ -1,8 +1,4 @@
 // Массив правил
-// 😝 текст. 
-// 😝 текст 2123
-// текстик
-
 const validationRules = [
     // missingDot Отсутствуют точки в конце абзацев
     {
@@ -312,5 +308,157 @@ const validationRules = [
             });
         }
     }
-
+    // stuckPunctuation Знаки препинания должны быть отделены пробелами
+    , {
+        id: 'punctuationSpacing',
+        name: 'Знаки препинания должны быть правильно отделены пробелами',
+        check: (text) => {
+            const problems = [];
+            
+            // 1. Проверяем обычные знаки препинания (прилипли к тексту)
+            const punctRegex = /[a-zA-Zа-яА-Я0-9]([.,:;!?])(?=[a-zA-Zа-яА-Я0-9])/g;
+            let match;
+            
+            while ((match = punctRegex.exec(text)) !== null) {
+                const punctChar = match[1];
+                const index = match.index + 1;
+                
+                problems.push({
+                    start: index,
+                    end: index + 1,
+                    message: `Добавьте пробел после знака "${punctChar}"`
+                });
+            }
+            
+            // 2. Проверяем тире (—) без пробелов вокруг
+            const dashRegex = /[a-zA-Zа-яА-Я0-9]—|—[a-zA-Zа-яА-Я0-9]/g;
+            
+            while ((match = dashRegex.exec(text)) !== null) {
+                const index = match.index;
+                const found = match[0];
+                
+                if (/[a-zA-Zа-яА-Я0-9]—/.test(found)) {
+                    problems.push({
+                        start: index,
+                        end: index + found.length,
+                        message: 'Добавьте пробел перед тире'
+                    });
+                } else {
+                    problems.push({
+                        start: index,
+                        end: index + found.length,
+                        message: 'Добавьте пробел после тире'
+                    });
+                }
+            }
+            
+            return problems;
+        },
+        fix: (text) => {
+            return text
+                // Исправляем обычные знаки препинания
+                .replace(/([a-zA-Zа-яА-Я0-9])([.,:;!?])(?=[a-zA-Zа-яА-Я0-9])/g, '$1$2 ')
+                // Исправляем тире
+                .replace(/([a-zA-Zа-яА-Я0-9])—/g, '$1 —')
+                .replace(/—([a-zA-Zа-яА-Я0-9])/g, '— $1');
+        }
+    }
+    // spelling Орфографические ошибки
+    , {
+        id: 'spelling',
+        name: 'Орфографические ошибки',
+        check: (text) => {
+            const problems = [];
+            const words = text.match(/[a-zA-Zа-яА-ЯёЁ]{3,}/g) || []; // только слова от 3 букв
+            
+            // Ограничиваем количество проверяемых слов
+            const wordsToCheck = words.slice(0, 100);
+            
+            wordsToCheck.forEach(word => {
+                try {
+                    if (!dictionary.check(word)) {
+                        const index = text.indexOf(word);
+                        if (index !== -1) {
+                            problems.push({
+                                start: index,
+                                end: index + word.length,
+                                message: `Возможная ошибка: "${word}"`
+                            });
+                        }
+                    }
+                } catch (e) {
+                    // Игнорируем ошибки проверки
+                    console.warn('Ошибка проверки слова:', word, e);
+                }
+            });
+            
+            return problems;
+        },
+        fix: null // Отключаем автозамену - она слишком тяжелая
+    }
+    // extraSpaces Лишние пробелы
+    , {
+        id: 'extraSpaces',
+        name: 'Лишние пробелы',
+        check: (text) => {
+            const problems = [];
+            
+            // Лишние пробелы
+            const doubleSpaces = / {2,}/g;
+            let match;
+            
+            while ((match = doubleSpaces.exec(text)) !== null) {
+                problems.push({
+                    start: match.index,
+                    end: match.index + match[0].length,
+                    message: 'Уберите лишние пробелы'
+                });
+            }
+            
+            // Пробелы перед знаками препинания
+            const spaceBeforePunct = / [.,!?;:)]/g;
+            while ((match = spaceBeforePunct.exec(text)) !== null) {
+                problems.push({
+                    start: match.index,
+                    end: match.index + 1,
+                    message: 'Уберите пробел перед знаком препинания'
+                });
+            }
+            
+            return problems;
+        },
+        fix: (text) => {
+            return text
+                .replace(/ {2,}/g, ' ') // Убираем двойные пробелы
+                .replace(/ ([.,!?;:)])/g, '$1'); // Убираем пробелы перед пунктуацией
+        }
+    }
+    // quoteMarks Неправильные кавычки
+    , {
+        id: 'quoteMarks',
+        name: 'Неправильные кавычки',
+        check: (text) => {
+            const problems = [];
+            
+            // Ищем неправильные кавычки (например, английские вместо русских)
+            const wrongQuotes = /["']/g;
+            let match;
+            
+            while ((match = wrongQuotes.exec(text)) !== null) {
+                problems.push({
+                    start: match.index,
+                    end: match.index + 1,
+                    message: 'Замените кавычки на «ёлочки» или „лапки“'
+                });
+            }
+            
+            return problems;
+        },
+        fix: (text) => {
+            // Простая замена прямых кавычек на ёлочки
+            return text
+                .replace(/"([^"]+)"/g, '«$1»')
+                .replace(/'([^']+)'/g, '«$1»');
+        }
+    }
 ];

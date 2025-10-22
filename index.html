@@ -1,50 +1,53 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Проверка поста для соцсетей</title>
-    <link rel="stylesheet" href="style.css?v=1.0.5">
-</head>
-<body>
-    <div class="container">
-        <header class="header">
-            <h1>Проверка поста для соцсетей</h1>
-            <p class="subtitle">Проверим текст на ошибки и улучшим оформление</p>
-        </header>
-
-        <main class="main">
-            <div id="status" class="status"></div>
-
-            <div class="input-section">
-                <label for="textInput" class="input-label">Текст поста:</label>
-                <textarea 
-                    id="textInput" 
-                    placeholder="Введите текст вашего поста здесь..."
-                    class="text-input"
-                ></textarea>
-                <span id="copyBtn" class="copy-btn">
-                    <i data-feather="copy" class="copy-icon"></i>
-                    <i data-feather="check" class="check-icon" style="display: none;"></i>
-                </span>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Проверка поста для соцсетей</title>
+        <link rel="stylesheet" href="style.css?v=1.0.6">
+    </head>
+    <body>
+        <div class="container">
+            <header class="header">
+                <h1>Проверка поста для соцсетей</h1>
+                <p class="subtitle">Проверим текст на ошибки и улучшим оформление</p>
+            </header>
+            <main class="main">
+                <div id="status" class="status"></div>
+                <div class="input-section">
+                    <label for="textInput" class="input-label">Текст поста:</label>
+                    <div class="input-container">
+                        <textarea id="textInput" class="text-input" placeholder="Введите текст вашего поста здесь..."></textarea>
+                        <div id="highlightOverlay" class="highlight-overlay"></div>
+                    </div>
+                    <span id="copyBtn" class="copy-btn">
+                        <i data-feather="copy" class="copy-icon"></i>
+                        <i data-feather="check" class="check-icon" style="display: none;"></i>
+                    </span>
+                </div>
+                <div class="actions">
+                    <button id="checkBtn" class="btn btn-check">
+                        <i data-feather="search"></i>
+                        Проверить текст
+                    </button>
+                    <button id="applyBtn" class="btn btn-apply" disabled>
+                        <i data-feather="star"></i>
+                        Применить исправления
+                    </button>
+                </div>
+            </main>
+        </div>
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-content">
+                <div class="loading-spinner">📚</div>
+                <h3>Загружаем словари...</h3>
+                <p>Это займет несколько секунд</p>
             </div>
-
-            <div class="actions">
-                <button id="checkBtn" class="btn btn-check">
-                    <i data-feather="search"></i>
-                    Проверить текст
-                </button>
-                
-                <button id="applyBtn" class="btn btn-apply" disabled>
-                    <i data-feather="star"></i>
-                    Применить исправления
-                </button>
-            </div>
-        </main>
-    </div>
-
-    <script src="https://unpkg.com/feather-icons"></script>
-    <script src="validation.js?v=1.0.5"></script>
-    <script src="script.js?v=1.0.5"></script>
-</body>
+        </div>
+        <script src="feather.min.js"></script>
+        <script src="typo.min.js"></script>
+        <script src="dicts.js?v=1.0.6"></script>
+        <script src="validation.js?v=1.0.6"></script>
+        <script src="script.js?v=1.0.6"></script>
+    </body>
 </html>
