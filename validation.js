@@ -1,9 +1,9 @@
 // Массив правил
 const validationRules = [
-    // missingDot Отсутствуют точки в конце абзацев
+    // endDot Присутствуют точки в конце абзацев
     {
-        id: 'missingDot',
-        name: 'Отсутствуют точки в конце абзацев',
+        id: 'endDot',
+        name: 'Присутствуют точки в конце абзацев',
         check: (text) => {
             const problems = [];
             const paragraphs = text.split('\n');
@@ -17,17 +17,17 @@ const validationRules = [
         
                 const trimmed = paragraph.trim();
                 const lastChar = trimmed[trimmed.length - 1];
-                const endsWithLetter = /[a-zA-Zа-яА-Я0-9]$/.test(lastChar);
+                const endsWithDot = lastChar === '.';
                 
                 // Проверяем, не является ли последнее слово хештегом
                 const lastWord = trimmed.split(/\s+/).pop();
                 const isHashtag = lastWord.startsWith('#');
     
-                if (endsWithLetter && !isHashtag) {
+                if (endsWithDot && !isHashtag) {
                     problems.push({
                         start: charIndex + paragraph.length - 1,
                         end: charIndex + paragraph.length,
-                        message: 'Абзац заканчивается буквой - добавьте пунктуацию или эмодзи'
+                        message: 'Абзац заканчивается точкой'
                     });
                 }
         
@@ -42,14 +42,15 @@ const validationRules = [
                 
                 const trimmed = paragraph.trim();
                 const lastChar = trimmed[trimmed.length - 1];
-                const endsWithLetter = /[a-zA-Zа-яА-Я0-9]$/.test(lastChar);
+                const endsWithDot = lastChar === '.';
                 
                 const lastWord = trimmed.split(/\s+/).pop();
                 const isHashtag = lastWord.startsWith('#');
                 
-                if (endsWithLetter && !isHashtag) {
-                    return trimmed + '.';
+                if (endsWithDot && !isHashtag) {
+                    return trimmed.slice(0, -1);
                 }
+
                 return paragraph;
             }).join('\n');
         }
@@ -268,13 +269,12 @@ const validationRules = [
                 
                 // Проверяем символ перед эмодзи
                 const charBefore = text[index - 1];
-                const hasTextBefore = charBefore && /\S/.test(charBefore);
-                const needsSpaceBefore = hasTextBefore && charBefore !== ' ' && charBefore !== '\n';
+                // Если перед эмодзи есть буква, цифра или большинство символов - нужен пробел
+                const needsSpaceBefore = charBefore && /[a-zA-Zа-яА-Я0-9.,!?;:()\-+='"@#$%^&*{}[\]\\|<>/]/.test(charBefore);
                 
                 // Проверяем символ после эмодзи
                 const charAfter = text[index + emoji.length];
-                const hasTextAfter = charAfter && /\S/.test(charAfter);
-                const needsSpaceAfter = hasTextAfter && charAfter !== ' ' && charAfter !== '\n';
+                const needsSpaceAfter = charAfter && /[a-zA-Zа-яА-Я0-9.,!?;:()\-+='"@#$%^&*{}[\]\\|<>/]/.test(charAfter);
                 
                 if (needsSpaceBefore || needsSpaceAfter) {
                     problems.push({
@@ -294,11 +294,8 @@ const validationRules = [
                 const charBefore = text[index - 1];
                 const charAfter = text[index + emoji.length];
                 
-                const hasTextBefore = charBefore && /\S/.test(charBefore);
-                const needsSpaceBefore = hasTextBefore && charBefore !== ' ' && charBefore !== '\n';
-                
-                const hasTextAfter = charAfter && /\S/.test(charAfter);
-                const needsSpaceAfter = hasTextAfter && charAfter !== ' ' && charAfter !== '\n';
+                const needsSpaceBefore = charBefore && /[a-zA-Zа-яА-Я0-9.,!?;:()\-+='"@#$%^&*{}[\]\\|<>/]/.test(charBefore);
+                const needsSpaceAfter = charAfter && /[a-zA-Zа-яА-Я0-9.,!?;:()\-+='"@#$%^&*{}[\]\\|<>/]/.test(charAfter);
                 
                 let result = emoji;
                 if (needsSpaceBefore) result = ' ' + result;
@@ -408,6 +405,7 @@ const validationRules = [
             let match;
             
             while ((match = doubleSpaces.exec(text)) !== null) {
+                console.log(match)
                 problems.push({
                     start: match.index,
                     end: match.index + match[0].length,
